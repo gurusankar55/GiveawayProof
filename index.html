@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GiveawayProof</title>
+<meta name="description" content="Crypto giveaways the host can't rig. GenLayer AI checks every entry against the rules, and the winner draw can be re-checked by anyone.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='14' width='56' height='36' rx='6' fill='%234C2FD0'/%3E%3Ccircle cx='4' cy='32' r='7' fill='%23ECE8FF'/%3E%3Ccircle cx='60' cy='32' r='7' fill='%23ECE8FF'/%3E%3Cpath d='M22 32l7 7 13-14' stroke='%23FFE98A' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECE8FF;
+  --card:#FBFAFF;
+  --ink:#1C1838;
+  --muted:#5D587D;
+  --line:#CFC8F2;
+  --violet:#4C2FD0;
+  --violet-deep:#3A20AE;
+  --ticket:#FFE98A;
+  --valid:#157A4F;
+  --valid-bg:#D9F2E5;
+  --invalid:#B93A12;
+  --invalid-bg:#FBE3D9;
+  --wait:#8A6A00;
+  --wait-bg:#FFF4C2;
+  --radius-lg:22px;
+  --radius-sm:10px;
+  --mono:"Space Mono", ui-monospace, monospace;
+  --sans:"Bricolage Grotesque", system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--violet)}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--violet);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.mono{font-family:var(--mono);font-size:.86em;letter-spacing:-.01em}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- header ---------- */
+header.top{position:sticky;top:0;z-index:20;background:rgba(236,232,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:16px;height:68px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;text-decoration:none;color:var(--ink);letter-spacing:-.02em}
+.brand svg{width:34px;height:34px}
+.net{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;background:#B9B3D6}
+.dot.on{background:var(--valid);box-shadow:0 0 0 4px rgba(21,122,79,.15)}
+.dot.off{background:var(--invalid)}
+.btn{display:inline-block;text-decoration:none;border:0;border-radius:999px;padding:11px 20px;font-weight:700;cursor:pointer;background:var(--violet);color:#fff;transition:background .15s, transform .1s}
+.btn:hover{background:var(--violet-deep)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.ghost:hover{background:rgba(28,24,56,.06)}
+.btn.gold{background:var(--ticket);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.gold:hover{background:#FFE16A}
+.btn.small{padding:8px 14px;font-size:14px;white-space:nowrap}
+
+/* ---------- hero ---------- */
+.hero{padding:64px 0 40px}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(44px,7vw,84px);line-height:.95;letter-spacing:-.045em;font-weight:800;margin:0 0 22px}
+.hero p.lead{font-size:20px;max-width:34em;color:#35305A;margin:0 0 28px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.stats{display:flex;gap:28px;margin-top:36px;flex-wrap:wrap}
+.stat b{display:block;font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.stat span{font-size:14px;color:var(--muted)}
+
+/* receipt tape: the memorable element */
+.tape-holder{position:relative}
+.tape{background:#fff;color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.6;padding:26px 24px 34px;border-radius:6px 6px 0 0;box-shadow:0 30px 60px -30px rgba(40,20,120,.45);
+  -webkit-mask:linear-gradient(#000,#000) top/100% calc(100% - 12px) no-repeat, conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/16px 12px repeat-x;
+          mask:linear-gradient(#000,#000) top/100% calc(100% - 12px) no-repeat, conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/16px 12px repeat-x}
+.tape .t-head{display:flex;justify-content:space-between;border-bottom:1.5px dashed #BDB6E4;padding-bottom:10px;margin-bottom:12px;font-weight:700}
+.tape .row{display:flex;justify-content:space-between;gap:12px}
+.tape .row span:first-child{color:#6E6894}
+.tape .hash{word-break:break-all;color:var(--violet)}
+.tape .pick{border-top:1.5px dashed #BDB6E4;margin-top:12px;padding-top:12px}
+.tape .verdict{margin-top:14px;padding:10px 12px;border-radius:8px;font-weight:700;text-align:center}
+.tape .verdict.ok{background:var(--valid-bg);color:var(--valid)}
+.tape .verdict.bad{background:var(--invalid-bg);color:var(--invalid)}
+.tape .verdict.wait{background:var(--wait-bg);color:var(--wait)}
+.tape-caption{font-size:14px;color:var(--muted);margin-top:14px;max-width:30em}
+.tape .line-in{opacity:0;transform:translateY(4px);animation:print .35s forwards}
+@keyframes print{to{opacity:1;transform:none}}
+
+/* ---------- steps ---------- */
+.steps{padding:28px 0 56px}
+.steps ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:2px solid var(--ink)}
+.steps li{padding:22px 22px 0 0;position:relative}
+.steps li+li{padding-left:22px;border-left:1px solid var(--line)}
+.steps .n{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--violet)}
+.steps h3{margin:6px 0 6px;font-size:21px;letter-spacing:-.02em}
+.steps p{margin:0;color:var(--muted);font-size:15.5px}
+
+/* ---------- main board ---------- */
+.board{padding:16px 0 80px}
+.board .wrap{display:grid;grid-template-columns:1fr 380px;gap:40px;align-items:start}
+.board h2{font-size:38px;letter-spacing:-.035em;margin:0;line-height:1.05}
+.list-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.filters{display:flex;gap:6px;background:#DCD6FB;padding:4px;border-radius:999px}
+.filters button{border:0;background:transparent;padding:7px 14px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
+.filters button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+.tickets{display:grid;gap:16px}
+.ticket{display:grid;grid-template-columns:120px 1fr;background:var(--card);border:0;padding:0;text-align:left;cursor:pointer;width:100%;border-radius:14px;
+  -webkit-mask:radial-gradient(circle 11px at 120px 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 11px at 120px 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+          mask:radial-gradient(circle 11px at 120px 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 11px at 120px 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+  transition:transform .15s}
+.ticket:hover{transform:translateX(4px)}
+.ticket .stub{background:var(--ticket);padding:18px 14px;display:flex;flex-direction:column;justify-content:space-between;border-right:2px dashed rgba(28,24,56,.35)}
+.ticket.closed .stub{background:#DCD6FB}
+.ticket .num{font-size:40px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.ticket .state{font-size:13px;font-weight:700}
+.ticket .body{padding:18px 22px;min-width:0}
+.ticket h3{margin:0 0 4px;font-size:21px;letter-spacing:-.02em;line-height:1.2;overflow-wrap:anywhere}
+.ticket .prize{font-weight:600;color:var(--violet);margin-bottom:10px}
+.ticket .meta{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.ticket .meta b{color:var(--ink)}
+
+.empty{background:var(--card);border-radius:var(--radius-lg);padding:36px;text-align:center;color:var(--muted)}
+.skeleton{height:118px;border-radius:14px;background:linear-gradient(90deg,#E2DDFB,#F1EEFF,#E2DDFB);background-size:200% 100%;animation:shimmer 1.4s infinite linear}
+@keyframes shimmer{to{background-position:-200% 0}}
+
+/* create form */
+.create{position:sticky;top:92px;background:var(--ink);color:#F1EEFF;border-radius:var(--radius-lg);padding:28px}
+.create h2{color:#fff;font-size:30px}
+.create p.sub{color:#B9B3D6;font-size:15px;margin:8px 0 20px}
+.field{margin-bottom:16px}
+.field label{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
+.field .hint{font-size:13px;color:var(--muted);margin-top:5px}
+.create .field .hint{color:#9C96C2}
+input,textarea{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:var(--radius-sm);padding:11px 13px;color:var(--ink)}
+textarea{resize:vertical;min-height:92px}
+.create input,.create textarea{border-color:#3B3664;background:#26214A;color:#fff}
+.create input::placeholder,.create textarea::placeholder{color:#8580AE}
+.counter{display:flex;align-items:center;gap:10px}
+.counter button{width:42px;height:42px;border-radius:50%;border:1.5px solid #3B3664;background:transparent;color:#fff;font-size:20px;cursor:pointer}
+.counter output{font-size:26px;font-weight:800;min-width:40px;text-align:center}
+.create .btn{width:100%;margin-top:6px;background:var(--ticket);color:var(--ink)}
+.create .btn:hover{background:#FFE16A}
+
+/* ---------- dialog ---------- */
+dialog{border:0;padding:0;border-radius:var(--radius-lg);width:min(860px,calc(100vw - 24px));max-height:calc(100vh - 32px);background:var(--paper);color:var(--ink);box-shadow:0 40px 80px -20px rgba(20,10,60,.5)}
+dialog::backdrop{background:rgba(28,24,56,.55);backdrop-filter:blur(3px)}
+dialog[open]{animation:pop .22s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}}
+.dlg-head{position:sticky;top:0;background:var(--ticket);padding:22px 26px;display:flex;gap:16px;align-items:start;border-bottom:2px dashed rgba(28,24,56,.35);z-index:2}
+.dlg-head h2{margin:0;font-size:30px;letter-spacing:-.03em;line-height:1.1;overflow-wrap:anywhere}
+.dlg-head .prize{font-weight:700;color:var(--violet-deep);margin-top:4px}
+.dlg-head .x{margin-left:auto;flex:none;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--ink);background:transparent;cursor:pointer;font-size:20px;line-height:1}
+.dlg-body{padding:24px 26px 30px;display:grid;gap:26px}
+.section h3{margin:0 0 10px;font-size:20px;letter-spacing:-.02em}
+.rules{background:var(--card);border-left:4px solid var(--violet);padding:14px 18px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px;color:var(--muted)}
+.facts b{color:var(--ink)}
+.enter{background:var(--card);border-radius:var(--radius-lg);padding:22px}
+.enter .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.notice{border-radius:var(--radius-sm);padding:12px 14px;font-size:15px}
+.notice.info{background:#DCD6FB}
+.notice.ok{background:var(--valid-bg);color:var(--valid)}
+.notice.bad{background:var(--invalid-bg);color:var(--invalid)}
+
+.progress{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.progress li{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted)}
+.progress li::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid #B9B3D6;flex:none}
+.progress li.now{color:var(--ink);font-weight:600}
+.progress li.now::before{border-color:var(--violet);border-top-color:transparent;animation:spin .8s linear infinite}
+.progress li.done{color:var(--ink)}
+.progress li.done::before{background:var(--valid);border-color:var(--valid)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th{text-align:left;font-weight:600;color:var(--muted);padding:8px 10px;border-bottom:1.5px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:12.5px;white-space:nowrap}
+.chip.VALID{background:var(--valid-bg);color:var(--valid)}
+.chip.INVALID{background:var(--invalid-bg);color:var(--invalid)}
+.chip.UNREADABLE{background:var(--wait-bg);color:var(--wait)}
+.chip.win{background:var(--ink);color:var(--ticket)}
+.you{font-size:12px;font-weight:700;color:var(--violet);margin-left:6px}
+
+.winners{display:grid;gap:10px}
+.winner{display:flex;align-items:center;gap:14px;background:var(--ink);color:#fff;border-radius:var(--radius-sm);padding:14px 16px}
+.winner .place{font-weight:800;color:var(--ticket);font-size:22px;min-width:34px}
+.winner .who{min-width:0}
+.winner .who div{overflow-wrap:anywhere}
+.winner .who small{color:#B9B3D6}
+
+/* wallet picker */
+.wallets{display:grid;gap:10px;padding:22px 26px 28px}
+.wallet-opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--line);background:var(--card);cursor:pointer;text-align:left;font-weight:700}
+.wallet-opt:hover{border-color:var(--violet)}
+.wallet-opt img{width:32px;height:32px;border-radius:8px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-size:15px;opacity:0;pointer-events:none;transition:all .25s;z-index:100;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+footer{border-top:2px solid var(--ink);padding:28px 0 40px;font-size:14px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* ---------- responsive ---------- */
+@media (max-width:960px){
+  .hero .wrap,.board .wrap{grid-template-columns:1fr}
+  .create{position:static}
+  .steps ol{grid-template-columns:1fr 1fr}
+  .steps li:nth-child(3){padding-left:0;border-left:0}
+  .steps li:nth-child(n+3){border-top:1px solid var(--line);margin-top:16px}
+}
+@media (max-width:600px){
+  body{font-size:16px}
+  .wrap{padding:0 16px}
+  .hero{padding-top:40px}
+  .net .label{display:none}
+  .steps ol{grid-template-columns:1fr}
+  .steps li,.steps li+li{padding:18px 0 0;border-left:0}
+  .steps li+li{border-top:1px solid var(--line);margin-top:16px}
+  .ticket{grid-template-columns:86px 1fr;
+    -webkit-mask:radial-gradient(circle 10px at 86px 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 10px at 86px 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+            mask:radial-gradient(circle 10px at 86px 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 10px at 86px 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+  .ticket .num{font-size:30px}
+  .enter .grid{grid-template-columns:1fr}
+  .dlg-head,.dlg-body{padding-left:18px;padding-right:18px}
+  .entries-table thead{display:none}
+  .entries-table tr{display:block;border-bottom:1px solid var(--line);padding:10px 0}
+  .entries-table td{display:block;border:0;padding:3px 0}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="14" width="56" height="36" rx="6" fill="#4C2FD0"/><circle cx="4" cy="32" r="7" fill="#ECE8FF"/><circle cx="60" cy="32" r="7" fill="#ECE8FF"/><path d="M22 32l7 7 13-14" stroke="#FFE98A" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      GiveawayProof
+    </a>
+    <div class="net" title="GenLayer Studio network"><span class="dot" id="netDot"></span><span class="label" id="netLabel">Connecting to GenLayer…</span></div>
+    <button class="btn small" id="walletBtn">Connect wallet</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Giveaways the host can't rig.</h1>
+        <p class="lead">Post your rules once. GenLayer's AI validators read every entry's proof link and judge it against those rules, then the winners are drawn from a hash that anyone can re-check — right here in the browser.</p>
+        <div class="ctas">
+          <a class="btn" href="#create">Start a giveaway</a>
+          <a class="btn ghost" href="#board">Browse giveaways</a>
+        </div>
+        <div class="stats" aria-live="polite">
+          <div class="stat"><b id="sTotal">–</b><span>giveaways on-chain</span></div>
+          <div class="stat"><b id="sEntries">–</b><span>entries judged by AI</span></div>
+          <div class="stat"><b id="sClosed">–</b><span>draws you can verify</span></div>
+        </div>
+      </div>
+      <div class="tape-holder">
+        <div class="tape" id="heroTape" aria-live="polite">
+          <div class="t-head"><span>DRAW RECEIPT</span><span>loading…</span></div>
+          <div class="row"><span>reading the latest draw from the contract</span></div>
+        </div>
+        <p class="tape-caption" id="heroCaption">This receipt is recomputed in your browser from on-chain entries. If the host had changed a single winner, it would not match.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps" aria-label="How it works">
+    <div class="wrap">
+      <ol>
+        <li><span class="n">1</span><h3>Host posts the rules</h3><p>Title, prize, number of winners and the rules in plain words. Stored on GenLayer, not on a spreadsheet.</p></li>
+        <li><span class="n">2</span><h3>People enter with proof</h3><p>Each wallet enters once with a public link that shows they followed the rules.</p></li>
+        <li><span class="n">3</span><h3>AI validators judge</h3><p>Several GenLayer validators open the link and must agree: valid, invalid, or unreadable.</p></li>
+        <li><span class="n">4</span><h3>Fair draw, open receipt</h3><p>The host closes entries. Winners come from a SHA-256 seed of all valid entries — re-check it any time.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="board" id="board">
+    <div class="wrap">
+      <div>
+        <div class="list-head">
+          <h2>Giveaways</h2>
+          <div class="filters" role="group" aria-label="Filter giveaways">
+            <button data-f="all" aria-pressed="true">All</button>
+            <button data-f="open" aria-pressed="false">Open</button>
+            <button data-f="closed" aria-pressed="false">Drawn</button>
+          </div>
+        </div>
+        <div class="tickets" id="tickets">
+          <div class="skeleton"></div><div class="skeleton"></div>
+        </div>
+      </div>
+
+      <form class="create" id="create" novalidate>
+        <h2>Start a giveaway</h2>
+        <p class="sub">You become the host. Only you can close entries and trigger the draw — but you can't choose who wins.</p>
+        <div class="field">
+          <label for="cTitle">Title</label>
+          <input id="cTitle" maxlength="80" placeholder="Weekend $50 giveaway" required>
+        </div>
+        <div class="field">
+          <label for="cPrize">Prize</label>
+          <input id="cPrize" maxlength="60" placeholder="50 USDT on Base">
+        </div>
+        <div class="field">
+          <label for="cRules">Rules</label>
+          <textarea id="cRules" maxlength="1000" placeholder="The proof link must be a public X post that quotes our announcement and tags 2 friends." required></textarea>
+          <div class="hint">Write rules a judge can check from one public web page.</div>
+        </div>
+        <div class="field">
+          <label id="cWinLbl">Winners</label>
+          <div class="counter" role="group" aria-labelledby="cWinLbl">
+            <button type="button" id="wMinus" aria-label="Fewer winners">−</button>
+            <output id="cWinners">1</output>
+            <button type="button" id="wPlus" aria-label="More winners">+</button>
+          </div>
+        </div>
+        <button class="btn" type="submit" id="createBtn">Publish giveaway</button>
+        <div id="createStatus" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>GiveawayProof · an Intelligent Contract on GenLayer Studio</span>
+    <span>Contract <a class="mono" id="contractLink" target="_blank" rel="noopener"></a></span>
+  </div>
+</footer>
+
+<dialog id="detail" aria-labelledby="dTitle"></dialog>
+
+<dialog id="walletDlg" aria-labelledby="wTitle">
+  <div class="dlg-head"><h2 id="wTitle">Choose a wallet</h2><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="wallets" id="walletList"></div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+setTimeout(function(){var l=document.getElementById("netLabel");if(l&&/Connecting/.test(l.textContent)){l.textContent="Network unreachable";document.getElementById("netDot").className="dot off";var t=document.getElementById("tickets");if(t)t.innerHTML='<div class="empty">Couldn\'t load the GenLayer library. Check your connection and reload the page.</div>';}},20000);
+</script>
+<script type="module">
+import { createClient } from "https://esm.sh/genlayer-js@1.1.8";
+import { studionet } from "https://esm.sh/genlayer-js@1.1.8/chains";
+
+const CONTRACT = "0x00D0C78A636202979561e69D848d79A492ffA36b";
+const EXPLORER = "https://explorer-studio.genlayer.com/address/" + CONTRACT;
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const short = (a) => (a && a.length > 12 ? a.slice(0, 6) + "…" + a.slice(-4) : a || "");
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const safeUrl = (u) => (/^https?:\/\//i.test(u || "") ? u : null);
+
+$("#contractLink").href = EXPLORER;
+$("#contractLink").textContent = short(CONTRACT);
+
+/* ---------------- clients ---------------- */
+const readClient = createClient({ chain: studionet });
+let writeClient = null;
+let account = null;
+let activeProvider = null;
+
+async function view(fn, args = []) {
+  return await readClient.readContract({ address: CONTRACT, functionName: fn, args });
+}
+const parse = (v) => (typeof v === "string" ? JSON.parse(v) : v);
+
+/* ---------------- toast ---------------- */
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 4200);
+}
+
+/* ---------------- wallet (EIP-6963 picker) ---------------- */
+const discovered = [];
+window.addEventListener("eip6963:announceProvider", (e) => {
+  const d = e.detail;
+  if (d && d.info && d.provider && !discovered.find((x) => x.info.uuid === d.info.uuid)) discovered.push(d);
+});
+window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+function updateWalletBtn() {
+  const b = $("#walletBtn");
+  if (account) { b.textContent = short(account); b.classList.add("ghost"); }
+  else { b.textContent = "Connect wallet"; b.classList.remove("ghost"); }
+}
+
+async function switchToStudionet(provider) {
+  const chainId = "0x" + Number(studionet.id).toString(16);
+  try {
+    await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId }] });
+  } catch (err) {
+    const code = err && (err.code ?? (err.data && err.data.originalError && err.data.originalError.code));
+    if (code === 4902 || code === -32603 || /unrecognized|not added|unknown chain/i.test(String(err && err.message))) {
+      await provider.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId,
+          chainName: studionet.name || "GenLayer Studio",
+          rpcUrls: studionet.rpcUrls.default.http,
+          nativeCurrency: studionet.nativeCurrency,
+        }],
+      });
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function connectWith(provider) {
+  const accs = await provider.request({ method: "eth_requestAccounts" });
+  if (!accs || !accs.length) throw new Error("No account was shared by the wallet.");
+  account = accs[0];
+  activeProvider = provider;
+  writeClient = createClient({ chain: studionet, account, provider });
+  try { await writeClient.connect("studionet"); }
+  catch (e) { await switchToStudionet(provider); }
+  if (provider.on) {
+    provider.on("accountsChanged", (a) => {
+      account = a && a[0] ? a[0] : null;
+      writeClient = account ? createClient({ chain: studionet, account, provider }) : null;
+      updateWalletBtn();
+      if ($("#detail").open && currentId) openDetail(currentId, true);
+    });
+  }
+  updateWalletBtn();
+  toast("Wallet connected: " + short(account));
+  if ($("#detail").open && currentId) openDetail(currentId, true);
+}
+
+async function connectWallet() {
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+  await sleep(150);
+  if (discovered.length === 0 && !window.ethereum) {
+    toast("No wallet found. Install MetaMask or Rabby, then reload this page.");
+    return false;
+  }
+  if (discovered.length <= 1) {
+    const p = discovered.length ? discovered[0].provider : window.ethereum;
+    try { await connectWith(p); return true; }
+    catch (e) { toast(niceError(e)); return false; }
+  }
+  return await new Promise((resolve) => {
+    const list = $("#walletList");
+    list.innerHTML = discovered.map((d, i) =>
+      `<button class="wallet-opt" data-i="${i}"><img src="${esc(d.info.icon)}" alt="">${esc(d.info.name)}</button>`).join("");
+    const dlg = $("#walletDlg");
+    const done = (v) => { dlg.close(); resolve(v); };
+    list.onclick = async (ev) => {
+      const btn = ev.target.closest(".wallet-opt");
+      if (!btn) return;
+      try { await connectWith(discovered[Number(btn.dataset.i)].provider); done(true); }
+      catch (e) { toast(niceError(e)); done(false); }
+    };
+    dlg.querySelector("[data-close]").onclick = () => done(false);
+    dlg.oncancel = () => resolve(false);
+    dlg.showModal();
+  });
+}
+
+$("#walletBtn").addEventListener("click", () => {
+  if (account) { navigator.clipboard?.writeText(account).then(() => toast("Address copied"), () => {}); return; }
+  connectWallet();
+});
+
+async function ensureWallet() {
+  if (account && writeClient) {
+    try { await writeClient.connect("studionet"); }
+    catch (e) { try { await switchToStudionet(activeProvider); } catch (_) {} }
+    return true;
+  }
+  return await connectWallet();
+}
+
+function niceError(e) {
+  const m = String((e && (e.shortMessage || e.message)) || e || "Something went wrong");
+  if (/reject|denied|cancel/i.test(m)) return "You cancelled the request in your wallet.";
+  if (/already entered/i.test(m)) return "This wallet has already entered this giveaway.";
+  if (/Only the host/i.test(m)) return "Only the host can close this giveaway.";
+  return m.length > 160 ? m.slice(0, 160) + "…" : m;
+}
+
+/* ---------------- write + confirm ---------------- */
+async function sendTx(fn, args) {
+  const hash = await writeClient.writeContract({ address: CONTRACT, functionName: fn, args, value: 0n });
+  return hash;
+}
+async function waitTx(hash) {
+  try {
+    await readClient.waitForTransactionReceipt({ hash, status: "ACCEPTED", interval: 4000, retries: 90 });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+async function pollUntil(check, timeoutMs = 120000, every = 4000) {
+  const end = Date.now() + timeoutMs;
+  while (Date.now() < end) {
+    try { const r = await check(); if (r) return r; } catch (_) {}
+    await sleep(every);
+  }
+  return null;
+}
+
+/* ---------------- draw verification (same math as the contract) ---------------- */
+async function sha256hex(s) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function recomputeDraw(g, entries) {
+  const valid = entries.filter((e) => e.verdict === "VALID").sort((a, b) => a.index - b.index);
+  const src = g.id + "|" + valid.map((e) => e.entrant + ":" + e.wallet).join("|");
+  const seed = await sha256hex(src);
+  const pool = valid.slice();
+  const picks = [];
+  const n = Math.min(Number(g.winners_count), pool.length);
+  for (let k = 0; k < n; k++) {
+    const h = await sha256hex(seed + ":" + k);
+    const size = pool.length;
+    const idx = Number(BigInt("0x" + h) % BigInt(size));
+    const p = pool.splice(idx, 1)[0];
+    picks.push({ k, h, size, idx, entrant: p.entrant, wallet: p.wallet });
+  }
+  const onchain = g.winners || [];
+  const sameWinners = onchain.length === picks.length &&
+    picks.every((p, i) => p.entrant.toLowerCase() === String(onchain[i].entrant).toLowerCase() && p.wallet === onchain[i].wallet);
+  return { seed, validCount: valid.length, picks, match: seed === g.seed && sameWinners };
+}
+
+function tapeHTML(g, r, animate) {
+  let i = 0;
+  const L = (html) => `<div class="${animate ? "line-in" : ""}" style="${animate ? `animation-delay:${(i++) * 90}ms` : ""}">${html}</div>`;
+  let out = `<div class="t-head"><span>DRAW RECEIPT</span><span>#${esc(g.id)}</span></div>`;
+  out += L(`<div class="row"><span>giveaway</span><span>${esc(g.title.length > 26 ? g.title.slice(0, 26) + "…" : g.title)}</span></div>`);
+  out += L(`<div class="row"><span>valid entries</span><span>${r.validCount}</span></div>`);
+  out += L(`<div class="row"><span>winners asked</span><span>${esc(g.winners_count)}</span></div>`);
+  out += L(`<div style="margin-top:8px;color:#6E6894">seed = sha256(id | entrant:wallet …)</div>`);
+  out += L(`<div class="hash">${esc(r.seed)}</div>`);
+  if (!r.picks.length) out += L(`<div class="pick">no valid entries — no winner drawn</div>`);
+  r.picks.forEach((p) => {
+    out += L(`<div class="pick"><div class="row"><span>pick ${p.k + 1}</span><span>hash mod ${p.size} = ${p.idx}</span></div><div class="hash">${esc(p.h.slice(0, 32))}…</div><div class="row"><span>winner</span><span>${esc(short(p.entrant))}</span></div></div>`);
+  });
+  out += L(r.match
+    ? `<div class="verdict ok">✓ matches the on-chain result</div>`
+    : `<div class="verdict bad">✗ does not match the on-chain result</div>`);
+  return out;
+}
+
+/* ---------------- data ---------------- */
+let all = [];
+let filter = "all";
+let currentId = null;
+
+async function loadAll() {
+  try {
+    const list = parse(await view("get_all_giveaways"));
+    all = Array.isArray(list) ? list : [];
+    $("#netDot").className = "dot on";
+    $("#netLabel").textContent = "GenLayer Studio";
+    renderStats();
+    renderTickets();
+    return true;
+  } catch (e) {
+    console.error(e);
+    $("#netDot").className = "dot off";
+    $("#netLabel").textContent = "Network unreachable";
+    $("#tickets").innerHTML = `<div class="empty">Couldn't reach the GenLayer Studio network. Check your connection and reload the page.</div>`;
+    return false;
+  }
+}
+
+function renderStats() {
+  $("#sTotal").textContent = all.length;
+  $("#sEntries").textContent = all.reduce((s, g) => s + Number(g.entry_count || 0), 0);
+  $("#sClosed").textContent = all.filter((g) => g.status === "closed").length;
+}
+
+function renderTickets() {
+  const items = all.filter((g) => filter === "all" || (filter === "open" ? g.status === "open" : g.status === "closed"));
+  if (!items.length) {
+    $("#tickets").innerHTML = `<div class="empty">${filter === "closed" ? "No draws yet. Close an open giveaway to run the first one." : filter === "open" ? "Nothing open right now. Start one with the form." : "No giveaways yet. Be the first host — use the form."}</div>`;
+    return;
+  }
+  $("#tickets").innerHTML = items.map((g) => `
+    <button class="ticket ${g.status === "closed" ? "closed" : ""}" data-id="${esc(g.id)}" aria-label="Open giveaway ${esc(g.id)}: ${esc(g.title)}">
+      <div class="stub"><span class="num">#${esc(g.id)}</span><span class="state">${g.status === "closed" ? "Drawn" : "Open"}</span></div>
+      <div class="body">
+        <h3>${esc(g.title)}</h3>
+        <div class="prize">${esc(g.prize || "Prize not stated")}</div>
+        <div class="meta"><span><b>${esc(g.entry_count)}</b> entries</span><span><b>${esc(g.valid_count)}</b> valid</span><span><b>${esc(g.winners_count)}</b> ${Number(g.winners_count) === 1 ? "winner" : "winners"}</span></div>
+      </div>
+    </button>`).join("");
+}
+
+$("#tickets").addEventListener("click", (e) => {
+  const t = e.target.closest(".ticket");
+  if (t) location.hash = "g-" + t.dataset.id;
+});
+document.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
+  filter = b.dataset.f;
+  document.querySelectorAll(".filters button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  renderTickets();
+}));
+
+async function renderHeroTape() {
+  const closed = all.filter((g) => g.status === "closed");
+  if (!closed.length) {
+    $("#heroTape").innerHTML = `<div class="t-head"><span>DRAW RECEIPT</span><span>waiting</span></div><div>No draw has happened yet. The first closed giveaway will print its receipt here.</div><div class="verdict wait">awaiting first draw</div>`;
+    return;
+  }
+  const g0 = closed[0];
+  try {
+    const g = parse(await view("get_giveaway", [String(g0.id)]));
+    const entries = parse(await view("get_entries", [String(g0.id)]));
+    const r = await recomputeDraw(g, entries);
+    $("#heroTape").innerHTML = tapeHTML(g, r, true);
+  } catch (e) {
+    $("#heroTape").innerHTML = `<div class="t-head"><span>DRAW RECEIPT</span><span>offline</span></div><div>Couldn't load the latest draw.</div>`;
+  }
+}
+
+/* ---------------- detail dialog ---------------- */
+const dlg = $("#detail");
+dlg.addEventListener("close", () => { if (location.hash.startsWith("#g-")) history.replaceState(null, "", location.pathname + location.search); currentId = null; });
+dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+
+async function openDetail(id, keepScroll) {
+  currentId = id;
+  const scrollTop = keepScroll ? dlg.scrollTop : 0;
+  if (!dlg.open) {
+    dlg.innerHTML = `<div class="dlg-head"><h2 id="dTitle">Loading #${esc(id)}…</h2><button class="x" type="button" aria-label="Close">×</button></div><div class="dlg-body"><div class="skeleton"></div></div>`;
+    dlg.querySelector(".x").onclick = () => dlg.close();
+    dlg.showModal();
+  }
+  let g, entries;
+  try {
+    g = parse(await view("get_giveaway", [String(id)]));
+    entries = parse(await view("get_entries", [String(id)]));
+  } catch (e) {
+    dlg.innerHTML = `<div class="dlg-head"><h2 id="dTitle">Giveaway #${esc(id)} not found</h2><button class="x" type="button" aria-label="Close">×</button></div><div class="dlg-body"><p>This giveaway doesn't exist on the contract. Check the link or pick one from the list.</p></div>`;
+    dlg.querySelector(".x").onclick = () => dlg.close();
+    return;
+  }
+  if (currentId !== id) return;
+
+  const me = account ? account.toLowerCase() : null;
+  const isHost = me && g.host.toLowerCase() === me;
+  const mine = me ? entries.find((e) => e.entrant.toLowerCase() === me) : null;
+  const winnerSet = new Set((g.winners || []).map((w) => String(w.entrant).toLowerCase() + "|" + w.wallet));
+
+  let enterBlock = "";
+  if (g.status === "open") {
+    if (mine) {
+      enterBlock = `<div class="notice ${mine.verdict === "VALID" ? "ok" : "bad"}">Your entry is in. The AI validators marked it <b>${esc(mine.verdict)}</b> — ${esc(mine.reason)}.</div>`;
+    } else {
+      enterBlock = `
+      <form class="enter" id="enterForm" novalidate>
+        <h3 style="margin:0 0 6px">Enter this giveaway</h3>
+        <p style="margin:0 0 16px;color:var(--muted);font-size:15px">One entry per wallet. Your proof link must be public — validators can't log in to see it.</p>
+        <div class="grid">
+          <div class="field"><label for="eWallet">Prize wallet</label><input id="eWallet" class="mono" placeholder="0x… or any address for the prize" maxlength="120" value="${esc(account || "")}"></div>
+          <div class="field"><label for="eProof">Proof link</label><input id="eProof" placeholder="https://…" maxlength="400" inputmode="url"></div>
+        </div>
+        <button class="btn" type="submit" id="enterBtn">Submit entry</button>
+        <ul class="progress" id="enterProgress" hidden>
+          <li data-s="sign">Confirm in your wallet</li>
+          <li data-s="judge">Validators open your link and judge it</li>
+          <li data-s="save">Result saved on-chain</li>
+        </ul>
+        <div id="enterStatus" aria-live="polite" style="margin-top:12px"></div>
+      </form>`;
+    }
+  }
+
+  let hostBlock = "";
+  if (g.status === "open" && isHost) {
+    hostBlock = `<div class="section"><h3>You're the host</h3>
+      <p style="margin:0 0 12px;color:var(--muted)">Closing stops new entries and runs the draw from all <b style="color:var(--ink)">${esc(g.valid_count)}</b> valid entries. This can't be undone.</p>
+      <button class="btn gold" id="closeBtn">Close entries and draw ${Number(g.winners_count) === 1 ? "the winner" : "winners"}</button>
+      <div id="closeStatus" aria-live="polite" style="margin-top:12px"></div></div>`;
+  }
+
+  let winnersBlock = "";
+  if (g.status === "closed") {
+    const ws = g.winners || [];
+    winnersBlock = `<div class="section"><h3>${ws.length === 1 ? "Winner" : "Winners"}</h3>${ws.length ? `<div class="winners">${ws.map((w, i) => `
+      <div class="winner"><span class="place">${i + 1}</span><div class="who"><div class="mono">${esc(w.wallet)}</div><small>entered by ${esc(short(w.entrant))}${safeUrl(w.proof_url) ? ` · <a href="${esc(w.proof_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--ticket)">proof</a>` : ""}</small></div></div>`).join("")}</div>` : `<div class="notice info">No valid entries, so no winner was drawn.</div>`}</div>
+      <div class="section"><h3>Check the draw yourself</h3><div class="tape" id="dTape"><div>Recomputing…</div></div></div>`;
+  }
+
+  const rows = entries.length ? entries.map((e) => {
+    const isWin = winnerSet.has(e.entrant.toLowerCase() + "|" + e.wallet);
+    const u = safeUrl(e.proof_url);
+    return `<tr>
+      <td>${esc(e.index)}</td>
+      <td class="mono">${esc(short(e.entrant))}${me && e.entrant.toLowerCase() === me ? `<span class="you">you</span>` : ""}</td>
+      <td>${u ? `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https?:\/\//, "").slice(0, 38))}</a>` : esc(e.proof_url)}</td>
+      <td><span class="chip ${esc(e.verdict)}">${esc(e.verdict)}</span>${isWin ? ` <span class="chip win">winner</span>` : ""}</td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="4" style="color:var(--muted)">No entries yet. ${g.status === "open" ? "Be the first." : ""}</td></tr>`;
+
+  dlg.innerHTML = `
+    <div class="dlg-head">
+      <div><h2 id="dTitle">${esc(g.title)}</h2><div class="prize">${esc(g.prize || "Prize not stated")}</div></div>
+      <button class="x" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="dlg-body">
+      <div class="facts">
+        <span>Giveaway <b>#${esc(g.id)}</b></span>
+        <span>Status <b>${g.status === "closed" ? "Drawn" : "Open for entries"}</b></span>
+        <span>Host <b class="mono">${esc(short(g.host))}</b>${isHost ? `<span class="you">you</span>` : ""}</span>
+        <span><b>${esc(g.winners_count)}</b> ${Number(g.winners_count) === 1 ? "winner" : "winners"}</span>
+      </div>
+      <div class="section"><h3>Rules the AI checks against</h3><div class="rules">${esc(g.rules)}</div></div>
+      ${winnersBlock}
+      ${enterBlock}
+      ${hostBlock}
+      <div class="section"><h3>Entries (${esc(g.entry_count)})</h3>
+        <table class="entries-table"><thead><tr><th>#</th><th>Entrant</th><th>Proof</th><th>AI verdict</th></tr></thead><tbody>${rows}</tbody></table>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn ghost small" id="copyLink">Copy link to this giveaway</button>
+        ${!account ? `<button class="btn small" id="dConnect">Connect wallet</button>` : ""}
+      </div>
+    </div>`;
+  dlg.scrollTop = scrollTop;
+  dlg.querySelector(".x").onclick = () => dlg.close();
+  $("#copyLink", dlg).onclick = () => {
+    const url = location.origin + location.pathname + "#g-" + g.id;
+    navigator.clipboard?.writeText(url).then(() => toast("Link copied"), () => toast(url));
+  };
+  const dc = $("#dConnect", dlg); if (dc) dc.onclick = () => connectWallet();
+
+  if (g.status === "closed") {
+    const r = await recomputeDraw(g, entries);
+    const t = $("#dTape", dlg); if (t) t.innerHTML = tapeHTML(g, r, false);
+  }
+
+  const ef = $("#enterForm", dlg);
+  if (ef) ef.addEventListener("submit", (ev) => { ev.preventDefault(); submitEntry(g); });
+  const cb = $("#closeBtn", dlg);
+  if (cb) cb.onclick = () => closeAndDraw(g);
+}
+
+function stepTo(listEl, key) {
+  const order = [...listEl.children].map((li) => li.dataset.s);
+  const at = order.indexOf(key);
+  [...listEl.children].forEach((li, i) => { li.className = i < at ? "done" : i === at ? "now" : ""; });
+}
+function allDone(listEl) { [...listEl.children].forEach((li) => (li.className = "done")); }
+
+async function submitEntry(g) {
+  const status = $("#enterStatus", dlg);
+  const wallet = $("#eWallet", dlg).value.trim();
+  const proof = $("#eProof", dlg).value.trim();
+  if (!wallet) { status.innerHTML = `<div class="notice bad">Add the wallet address that should receive the prize.</div>`; return; }
+  if (!/^https?:\/\/\S+\.\S+/i.test(proof)) { status.innerHTML = `<div class="notice bad">The proof link must start with https:// and point to a public page.</div>`; return; }
+  if (!(await ensureWallet())) return;
+
+  const btn = $("#enterBtn", dlg);
+  const prog = $("#enterProgress", dlg);
+  btn.disabled = true; prog.hidden = false; status.innerHTML = "";
+  stepTo(prog, "sign");
+  const me = account.toLowerCase();
+  try {
+    const hash = await sendTx("submit_entry", [String(g.id), wallet, proof]);
+    stepTo(prog, "judge");
+    await waitTx(hash);
+    stepTo(prog, "save");
+    const found = await pollUntil(async () => {
+      const es = parse(await view("get_entries", [String(g.id)]));
+      return es.find((e) => e.entrant.toLowerCase() === me);
+    }, 150000);
+    if (!found) {
+      status.innerHTML = `<div class="notice bad">Your entry wasn't saved. It may have been refused — for example if this wallet already entered, or entries are closed. Reload and check the list.</div>`;
+      btn.disabled = false; return;
+    }
+    allDone(prog);
+    toast(found.verdict === "VALID" ? "Entry accepted as VALID" : "Entry judged " + found.verdict);
+    await loadAll();
+    await openDetail(g.id, true);
+  } catch (e) {
+    status.innerHTML = `<div class="notice bad">${esc(niceError(e))}</div>`;
+    btn.disabled = false; prog.hidden = true;
+  }
+}
+
+async function closeAndDraw(g) {
+  if (!(await ensureWallet())) return;
+  if (account.toLowerCase() !== g.host.toLowerCase()) { toast("Only the host can close this giveaway."); return; }
+  if (!confirm("Close entries and draw now? This can't be undone.")) return;
+  const btn = $("#closeBtn", dlg), status = $("#closeStatus", dlg);
+  btn.disabled = true; status.innerHTML = `<div class="notice info">Confirm in your wallet, then the draw runs on-chain…</div>`;
+  try {
+    const hash = await sendTx("close_and_pick", [String(g.id)]);
+    status.innerHTML = `<div class="notice info">Drawing winners on GenLayer…</div>`;
+    await waitTx(hash);
+    const done = await pollUntil(async () => {
+      const x = parse(await view("get_giveaway", [String(g.id)]));
+      return x.status === "closed" ? x : null;
+    }, 120000);
+    if (!done) { status.innerHTML = `<div class="notice bad">The draw isn't confirmed yet. Reload in a minute to see the result.</div>`; btn.disabled = false; return; }
+    toast("Winners drawn");
+    await loadAll();
+    renderHeroTape();
+    await openDetail(g.id, false);
+  } catch (e) {
+    status.innerHTML = `<div class="notice bad">${esc(niceError(e))}</div>`;
+    btn.disabled = false;
+  }
+}
+
+/* ---------------- create ---------------- */
+let winners = 1;
+const wOut = $("#cWinners");
+$("#wMinus").onclick = () => { winners = Math.max(1, winners - 1); wOut.textContent = winners; };
+$("#wPlus").onclick = () => { winners = Math.min(50, winners + 1); wOut.textContent = winners; };
+
+$("#create").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const title = $("#cTitle").value.trim();
+  const prize = $("#cPrize").value.trim();
+  const rules = $("#cRules").value.trim();
+  const st = $("#createStatus");
+  if (!title) { st.innerHTML = `<div class="notice bad" style="margin-top:12px">Add a title for your giveaway.</div>`; $("#cTitle").focus(); return; }
+  if (rules.length < 15) { st.innerHTML = `<div class="notice bad" style="margin-top:12px">Write the rules in a full sentence so the AI can judge entries.</div>`; $("#cRules").focus(); return; }
+  if (!(await ensureWallet())) return;
+
+  const btn = $("#createBtn");
+  btn.disabled = true; btn.textContent = "Confirm in your wallet…"; st.innerHTML = "";
+  try {
+    const before = Number(await view("get_giveaway_count"));
+    const hash = await sendTx("create_giveaway", [title, rules, prize, winners]);
+    btn.textContent = "Publishing on GenLayer…";
+    await waitTx(hash);
+    const newId = await pollUntil(async () => {
+      const c = Number(await view("get_giveaway_count"));
+      return c > before ? c : null;
+    }, 120000);
+    if (!newId) { st.innerHTML = `<div class="notice bad" style="margin-top:12px">Not confirmed yet. Reload in a minute — it should appear in the list.</div>`; return; }
+    $("#create").reset(); winners = 1; wOut.textContent = 1;
+    toast("Giveaway #" + newId + " published");
+    await loadAll();
+    location.hash = "g-" + newId;
+  } catch (e) {
+    st.innerHTML = `<div class="notice bad" style="margin-top:12px">${esc(niceError(e))}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = "Publish giveaway";
+  }
+});
+
+/* ---------------- routing + boot ---------------- */
+function route() {
+  const m = location.hash.match(/^#g-(\d+)$/);
+  if (m) openDetail(m[1]);
+}
+window.addEventListener("hashchange", route);
+
+(async () => {
+  const ok = await loadAll();
+  if (ok) renderHeroTape();
+  route();
+})();
+</script>
+</body>
+</html>
