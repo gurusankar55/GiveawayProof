@@ -131,6 +131,20 @@ then visit `http://localhost:8000`.
 
 ---
 
+## Tested live on GenLayer Studio (Nov 12, 2026)
+
+Contract `0x58dd856cf9E0cd2357218321768a27b99F618712`, two wallets: host `0xC1E4…29F6` and entrant `0xA407…dfbb`.
+
+| # | Step | Result | Evidence |
+|---|---|---|---|
+| 1 | Giveaway #1 created with **1 GEN locked**, 10-minute window; entrant submits `docs.genlayer.com` against rule "post a public tweet" | Validators judged **INVALID** (correct — not a tweet) | [1-entry-invalid.png](evidence/1-entry-invalid.png) |
+| 2 | Giveaway #2 created with **1 GEN locked**; entrant submits `docs.genlayer.com` against rule "official GenLayer website page" | Validators judged **VALID** | [2-entry-valid.png](evidence/2-entry-valid.png) |
+| 3 | #1 closes with no valid entries; `draw` called | Status **No valid entries**, contract refunded 1 GEN to the host | [3-no-valid-entries-refund.png](evidence/3-no-valid-entries-refund.png) |
+| 4 | Explorer view of the wallet | On-chain **Send** transaction from the contract to the wallet, FINALIZED | [4-explorer-contract-send-tx.png](evidence/4-explorer-contract-send-tx.png) |
+| 5 | #2 closes at its fixed time; **host** calls `draw` | Status **Prize paid**, contract sent 1 GEN to the winner wallet (balance 5.4 → 6.4 GEN); browser receipt: drand value matches, seed and winner match on-chain | [5-prize-paid-receipt.png](evidence/5-prize-paid-receipt.png) |
+
+![Prize paid receipt](evidence/5-prize-paid-receipt.png)
+
 ## Trust model and limitations
 
 - Randomness comes from drand (League of Entropy). Validators fetch the round and must agree on it; anyone can compare it with drand directly from the receipt.
