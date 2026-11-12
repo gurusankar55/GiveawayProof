@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GiveawayProof</title>
-<meta name="description" content="Crypto giveaways the host can't rig. GenLayer AI checks every entry against the rules, and the winner draw can be re-checked by anyone.">
+<meta name="description" content="Crypto giveaways the host can't rig. The prize is locked in the contract, GenLayer AI checks every entry, and winners come from public drand randomness published after entries close.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='14' width='56' height='36' rx='6' fill='%234C2FD0'/%3E%3Ccircle cx='4' cy='32' r='7' fill='%23ECE8FF'/%3E%3Ccircle cx='60' cy='32' r='7' fill='%23ECE8FF'/%3E%3Cpath d='M22 32l7 7 13-14' stroke='%23FFE98A' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -134,9 +134,13 @@ header.top .wrap{display:flex;align-items:center;gap:16px;height:68px}
 .field label{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
 .field .hint{font-size:13px;color:var(--muted);margin-top:5px}
 .create .field .hint{color:#9C96C2}
-input,textarea{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:var(--radius-sm);padding:11px 13px;color:var(--ink)}
+input,textarea,select{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:var(--radius-sm);padding:11px 13px;color:var(--ink);font:inherit}
 textarea{resize:vertical;min-height:92px}
-.create input,.create textarea{border-color:#3B3664;background:#26214A;color:#fff}
+.create input,.create textarea,.create select{border-color:#3B3664;background:#26214A;color:#fff}
+.lock{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:var(--ticket);border-radius:999px;padding:3px 11px;font-size:13px;font-weight:700}
+.chip.status{background:#DCD6FB;color:var(--ink)}
+.payouts{font-size:14.5px}
+.countdown{font-family:var(--mono);font-weight:700}
 .create input::placeholder,.create textarea::placeholder{color:#8580AE}
 .counter{display:flex;align-items:center;gap:10px}
 .counter button{width:42px;height:42px;border-radius:50%;border:1.5px solid #3B3664;background:transparent;color:#fff;font-size:20px;cursor:pointer}
@@ -250,7 +254,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="wrap">
       <div>
         <h1>Giveaways the host can't rig.</h1>
-        <p class="lead">Post your rules once. GenLayer's AI validators read every entry's proof link and judge it against those rules, then the winners are drawn from a hash that anyone can re-check — right here in the browser.</p>
+        <p class="lead">The prize is locked in the contract from the first second. GenLayer's AI validators judge every entry against the rules. Entries close at a fixed time, the winners come from public drand randomness published <em>after</em> closing, and the contract pays them itself.</p>
         <div class="ctas">
           <a class="btn" href="#create">Start a giveaway</a>
           <a class="btn ghost" href="#board">Browse giveaways</a>
@@ -258,7 +262,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         <div class="stats" aria-live="polite">
           <div class="stat"><b id="sTotal">–</b><span>giveaways on-chain</span></div>
           <div class="stat"><b id="sEntries">–</b><span>entries judged by AI</span></div>
-          <div class="stat"><b id="sClosed">–</b><span>draws you can verify</span></div>
+          <div class="stat"><b id="sClosed">–</b><span>prizes paid on-chain</span></div>
+          <div class="stat"><b id="sLocked">–</b><span>GEN locked right now</span></div>
         </div>
       </div>
       <div class="tape-holder">
@@ -266,7 +271,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           <div class="t-head"><span>DRAW RECEIPT</span><span>loading…</span></div>
           <div class="row"><span>reading the latest draw from the contract</span></div>
         </div>
-        <p class="tape-caption" id="heroCaption">This receipt is recomputed in your browser from on-chain entries. If the host had changed a single winner, it would not match.</p>
+        <p class="tape-caption" id="heroCaption">This receipt is recomputed in your browser from the on-chain entries and the public drand round. If a single winner had been changed, it would not match.</p>
       </div>
     </div>
   </section>
@@ -274,10 +279,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   <section class="steps" aria-label="How it works">
     <div class="wrap">
       <ol>
-        <li><span class="n">1</span><h3>Host posts the rules</h3><p>Title, prize, number of winners and the rules in plain words. Stored on GenLayer, not on a spreadsheet.</p></li>
-        <li><span class="n">2</span><h3>People enter with proof</h3><p>Each wallet enters once with a public link that shows they followed the rules.</p></li>
+        <li><span class="n">1</span><h3>Host locks the prize</h3><p>The GEN prize is sent into the contract with the rules. The closing time is fixed at that moment and can't be moved.</p></li>
+        <li><span class="n">2</span><h3>People enter with proof</h3><p>One entry per wallet and per proof link. The host can't enter, and can't cancel once anyone has joined.</p></li>
         <li><span class="n">3</span><h3>AI validators judge</h3><p>Several GenLayer validators open the link and must agree: valid, invalid, or unreadable.</p></li>
-        <li><span class="n">4</span><h3>Fair draw, open receipt</h3><p>The host closes entries. Winners come from a SHA-256 seed of all valid entries — re-check it any time.</p></li>
+        <li><span class="n">4</span><h3>Unpredictable draw, auto-pay</h3><p>Anyone triggers the draw after closing. It uses a drand round published after closing, so nobody can know the winner in advance — then the contract pays.</p></li>
       </ol>
     </div>
   </section>
@@ -290,7 +295,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           <div class="filters" role="group" aria-label="Filter giveaways">
             <button data-f="all" aria-pressed="true">All</button>
             <button data-f="open" aria-pressed="false">Open</button>
-            <button data-f="closed" aria-pressed="false">Drawn</button>
+            <button data-f="closed" aria-pressed="false">Settled</button>
           </div>
         </div>
         <div class="tickets" id="tickets">
@@ -300,14 +305,27 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
       <form class="create" id="create" novalidate>
         <h2>Start a giveaway</h2>
-        <p class="sub">You become the host. Only you can close entries and trigger the draw — but you can't choose who wins.</p>
+        <p class="sub">You become the host. Your prize is locked in the contract right away. You can't move the closing time, pick the winner or take the prize back once people enter.</p>
         <div class="field">
           <label for="cTitle">Title</label>
-          <input id="cTitle" maxlength="80" placeholder="Weekend $50 giveaway" required>
+          <input id="cTitle" maxlength="80" placeholder="Weekend GEN giveaway" required>
         </div>
         <div class="field">
-          <label for="cPrize">Prize</label>
-          <input id="cPrize" maxlength="60" placeholder="50 USDT on Base">
+          <label for="cPrize">Prize to lock (GEN)</label>
+          <input id="cPrize" inputmode="decimal" maxlength="24" placeholder="10">
+          <div class="hint">Sent with this transaction and held by the contract. Split equally between the winners.</div>
+        </div>
+        <div class="field">
+          <label for="cDuration">Entries close after</label>
+          <select id="cDuration">
+            <option value="10">10 minutes</option>
+            <option value="60">1 hour</option>
+            <option value="360">6 hours</option>
+            <option value="1440" selected>24 hours</option>
+            <option value="4320">3 days</option>
+            <option value="10080">7 days</option>
+          </select>
+          <div class="hint">Fixed on-chain when you publish. Nobody can close early or extend it.</div>
         </div>
         <div class="field">
           <label for="cRules">Rules</label>
@@ -352,8 +370,48 @@ setTimeout(function(){var l=document.getElementById("netLabel");if(l&&/Connectin
 import { createClient } from "https://esm.sh/genlayer-js@1.1.8";
 import { studionet } from "https://esm.sh/genlayer-js@1.1.8/chains";
 
-const CONTRACT = "0x00D0C78A636202979561e69D848d79A492ffA36b";
+const CONTRACT = "0x58dd856cf9E0cd2357218321768a27b99F618712";
 const EXPLORER = "https://explorer-studio.genlayer.com/address/" + CONTRACT;
+const DRAND_CHAIN = "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971";
+const DRAND_URL = (r) => "https://api.drand.sh/" + DRAND_CHAIN + "/public/" + r;
+
+const nowS = () => Math.floor(Date.now() / 1000);
+const WEI = 10n ** 18n;
+function fmtGEN(wei) {
+  let w;
+  try { w = BigInt(String(wei ?? "0")); } catch (_) { return "0"; }
+  const whole = w / WEI;
+  let frac = (w % WEI).toString().padStart(18, "0").replace(/0+$/, "").slice(0, 6);
+  return whole.toString() + (frac ? "." + frac : "");
+}
+function parseGEN(s) {
+  const t = String(s || "").trim();
+  if (!/^\d+(\.\d{1,18})?$/.test(t)) return null;
+  const [a, b = ""] = t.split(".");
+  return BigInt(a) * WEI + BigInt((b + "0".repeat(18)).slice(0, 18));
+}
+function fmtTime(ts) {
+  return new Date(Number(ts) * 1000).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+}
+function fmtLeft(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  const d = Math.floor(sec / 86400), h = Math.floor((sec % 86400) / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  if (d) return `${d}d ${h}h ${m}m`;
+  if (h) return `${h}h ${m}m`;
+  if (m) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+const SETTLED = { paid: "Prize paid", split: "Split to entrants", no_winners: "No valid entries", cancelled: "Cancelled" };
+function phase(g) {
+  if (g.status !== "open") return "settled";
+  return nowS() < Number(g.close_at) ? "entries" : "draw";
+}
+function stateLabel(g) {
+  const p = phase(g);
+  if (p === "entries") return "Open";
+  if (p === "draw") return "Ready to draw";
+  return SETTLED[g.status] || g.status;
+}
 
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -489,14 +547,18 @@ async function ensureWallet() {
 function niceError(e) {
   const m = String((e && (e.shortMessage || e.message)) || e || "Something went wrong");
   if (/reject|denied|cancel/i.test(m)) return "You cancelled the request in your wallet.";
+  if (/prize wallet already entered/i.test(m)) return "This prize wallet already entered this giveaway.";
+  if (/proof link was already used/i.test(m)) return "This proof link was already used by another entry.";
   if (/already entered/i.test(m)) return "This wallet has already entered this giveaway.";
-  if (/Only the host/i.test(m)) return "Only the host can close this giveaway.";
+  if (/host cannot enter/i.test(m)) return "The host can't enter their own giveaway.";
+  if (/Only the host/i.test(m)) return "Only the host can do this.";
+  if (/insufficient|not enough|exceeds balance/i.test(m)) return "Your wallet doesn't have enough GEN for this prize.";
   return m.length > 160 ? m.slice(0, 160) + "…" : m;
 }
 
 /* ---------------- write + confirm ---------------- */
-async function sendTx(fn, args) {
-  const hash = await writeClient.writeContract({ address: CONTRACT, functionName: fn, args, value: 0n });
+async function sendTx(fn, args, value = 0n) {
+  const hash = await writeClient.writeContract({ address: CONTRACT, functionName: fn, args, value });
   return hash;
 }
 async function waitTx(hash) {
@@ -521,9 +583,20 @@ async function sha256hex(s) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+async function drandCheck(g) {
+  // ask drand directly from the browser: is the on-chain randomness the real public round?
+  try {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 8000);
+    const r = await fetch(DRAND_URL(g.draw_round), { signal: ctl.signal });
+    clearTimeout(t);
+    const j = await r.json();
+    return Number(j.round) === Number(g.draw_round) && String(j.randomness).toLowerCase() === String(g.randomness).toLowerCase() ? "ok" : "bad";
+  } catch (_) { return "unknown"; }
+}
 async function recomputeDraw(g, entries) {
   const valid = entries.filter((e) => e.verdict === "VALID").sort((a, b) => a.index - b.index);
-  const src = g.id + "|" + valid.map((e) => e.entrant + ":" + e.wallet).join("|");
+  const src = g.randomness + "|" + g.id + "|" + valid.map((e) => e.entrant + ":" + e.wallet).join("|");
   const seed = await sha256hex(src);
   const pool = valid.slice();
   const picks = [];
@@ -538,7 +611,8 @@ async function recomputeDraw(g, entries) {
   const onchain = g.winners || [];
   const sameWinners = onchain.length === picks.length &&
     picks.every((p, i) => p.entrant.toLowerCase() === String(onchain[i].entrant).toLowerCase() && p.wallet === onchain[i].wallet);
-  return { seed, validCount: valid.length, picks, match: seed === g.seed && sameWinners };
+  const drand = await drandCheck(g);
+  return { seed, validCount: valid.length, picks, drand, match: seed === g.seed && sameWinners && drand !== "bad" };
 }
 
 function tapeHTML(g, r, animate) {
@@ -548,11 +622,17 @@ function tapeHTML(g, r, animate) {
   out += L(`<div class="row"><span>giveaway</span><span>${esc(g.title.length > 26 ? g.title.slice(0, 26) + "…" : g.title)}</span></div>`);
   out += L(`<div class="row"><span>valid entries</span><span>${r.validCount}</span></div>`);
   out += L(`<div class="row"><span>winners asked</span><span>${esc(g.winners_count)}</span></div>`);
-  out += L(`<div style="margin-top:8px;color:#6E6894">seed = sha256(id | entrant:wallet …)</div>`);
+  out += L(`<div class="row"><span>prize locked</span><span>${esc(fmtGEN(g.prize_wei))} GEN</span></div>`);
+  out += L(`<div class="row"><span>entries closed</span><span>${esc(fmtTime(g.close_at))}</span></div>`);
+  out += L(`<div class="row"><span>drand round</span><span><a href="${esc(DRAND_URL(g.draw_round))}" target="_blank" rel="noopener noreferrer">${esc(g.draw_round)}</a></span></div>`);
+  out += L(`<div class="hash">${esc(g.randomness)}</div>`);
+  out += L(`<div class="row"><span>drand says</span><span>${r.drand === "ok" ? "✓ same value" : r.drand === "bad" ? "✗ different value" : "couldn't reach drand — open the link"}</span></div>`);
+  out += L(`<div style="margin-top:8px;color:#6E6894">seed = sha256(randomness | id | entrant:wallet …)</div>`);
   out += L(`<div class="hash">${esc(r.seed)}</div>`);
   if (!r.picks.length) out += L(`<div class="pick">no valid entries — no winner drawn</div>`);
-  r.picks.forEach((p) => {
-    out += L(`<div class="pick"><div class="row"><span>pick ${p.k + 1}</span><span>hash mod ${p.size} = ${p.idx}</span></div><div class="hash">${esc(p.h.slice(0, 32))}…</div><div class="row"><span>winner</span><span>${esc(short(p.entrant))}</span></div></div>`);
+  const amounts = (g.winners || []).map((w) => w.amount_wei);
+  r.picks.forEach((p, i) => {
+    out += L(`<div class="pick"><div class="row"><span>pick ${p.k + 1}</span><span>hash mod ${p.size} = ${p.idx}</span></div><div class="hash">${esc(p.h.slice(0, 32))}…</div><div class="row"><span>winner</span><span>${esc(short(p.wallet))}</span></div>${amounts[i] ? `<div class="row"><span>paid</span><span>${esc(fmtGEN(amounts[i]))} GEN</span></div>` : ""}</div>`);
   });
   out += L(r.match
     ? `<div class="verdict ok">✓ matches the on-chain result</div>`
@@ -586,24 +666,31 @@ async function loadAll() {
 function renderStats() {
   $("#sTotal").textContent = all.length;
   $("#sEntries").textContent = all.reduce((s, g) => s + Number(g.entry_count || 0), 0);
-  $("#sClosed").textContent = all.filter((g) => g.status === "closed").length;
+  $("#sClosed").textContent = all.filter((g) => g.status === "paid" || g.status === "split").length;
+  let locked = 0n;
+  all.forEach((g) => { if (g.status === "open") { try { locked += BigInt(g.prize_wei); } catch (_) {} } });
+  $("#sLocked").textContent = fmtGEN(locked.toString());
 }
 
 function renderTickets() {
-  const items = all.filter((g) => filter === "all" || (filter === "open" ? g.status === "open" : g.status === "closed"));
+  const items = all.filter((g) => filter === "all" || (filter === "open" ? g.status === "open" : g.status !== "open"));
   if (!items.length) {
-    $("#tickets").innerHTML = `<div class="empty">${filter === "closed" ? "No draws yet. Close an open giveaway to run the first one." : filter === "open" ? "Nothing open right now. Start one with the form." : "No giveaways yet. Be the first host — use the form."}</div>`;
+    $("#tickets").innerHTML = `<div class="empty">${filter === "closed" ? "Nothing settled yet. When an open giveaway closes, anyone can run its draw." : filter === "open" ? "Nothing open right now. Start one with the form." : "No giveaways yet. Be the first host — use the form."}</div>`;
     return;
   }
-  $("#tickets").innerHTML = items.map((g) => `
-    <button class="ticket ${g.status === "closed" ? "closed" : ""}" data-id="${esc(g.id)}" aria-label="Open giveaway ${esc(g.id)}: ${esc(g.title)}">
-      <div class="stub"><span class="num">#${esc(g.id)}</span><span class="state">${g.status === "closed" ? "Drawn" : "Open"}</span></div>
+  $("#tickets").innerHTML = items.map((g) => {
+    const p = phase(g);
+    const when = p === "entries" ? `<span>closes in <b>${esc(fmtLeft(Number(g.close_at) - nowS()))}</b></span>` : "";
+    return `
+    <button class="ticket ${p === "settled" ? "closed" : ""}" data-id="${esc(g.id)}" aria-label="Open giveaway ${esc(g.id)}: ${esc(g.title)}">
+      <div class="stub"><span class="num">#${esc(g.id)}</span><span class="state">${esc(stateLabel(g))}</span></div>
       <div class="body">
         <h3>${esc(g.title)}</h3>
-        <div class="prize">${esc(g.prize || "Prize not stated")}</div>
-        <div class="meta"><span><b>${esc(g.entry_count)}</b> entries</span><span><b>${esc(g.valid_count)}</b> valid</span><span><b>${esc(g.winners_count)}</b> ${Number(g.winners_count) === 1 ? "winner" : "winners"}</span></div>
+        <div class="prize"><span class="lock">🔒 ${esc(fmtGEN(g.prize_wei))} GEN ${g.status === "open" ? "locked" : ""}</span></div>
+        <div class="meta"><span><b>${esc(g.entry_count)}</b> entries</span><span><b>${esc(g.valid_count)}</b> valid</span><span><b>${esc(g.winners_count)}</b> ${Number(g.winners_count) === 1 ? "winner" : "winners"}</span>${when}</div>
       </div>
-    </button>`).join("");
+    </button>`;
+  }).join("");
 }
 
 $("#tickets").addEventListener("click", (e) => {
@@ -617,9 +704,9 @@ document.querySelectorAll(".filters button").forEach((b) => b.addEventListener("
 }));
 
 async function renderHeroTape() {
-  const closed = all.filter((g) => g.status === "closed");
+  const closed = all.filter((g) => g.status === "paid");
   if (!closed.length) {
-    $("#heroTape").innerHTML = `<div class="t-head"><span>DRAW RECEIPT</span><span>waiting</span></div><div>No draw has happened yet. The first closed giveaway will print its receipt here.</div><div class="verdict wait">awaiting first draw</div>`;
+    $("#heroTape").innerHTML = `<div class="t-head"><span>DRAW RECEIPT</span><span>waiting</span></div><div>No draw has happened yet. The first paid giveaway will print its receipt here.</div><div class="verdict wait">awaiting first draw</div>`;
     return;
   }
   const g0 = closed[0];
@@ -662,17 +749,21 @@ async function openDetail(id, keepScroll) {
   const mine = me ? entries.find((e) => e.entrant.toLowerCase() === me) : null;
   const winnerSet = new Set((g.winners || []).map((w) => String(w.entrant).toLowerCase() + "|" + w.wallet));
 
+  const ph = phase(g);
+  const isHostEntry = !!isHost;
   let enterBlock = "";
-  if (g.status === "open") {
+  if (ph === "entries" && isHostEntry) {
+    enterBlock = `<div class="notice info">You're the host, so you can't enter your own giveaway.</div>`;
+  } else if (ph === "entries") {
     if (mine) {
       enterBlock = `<div class="notice ${mine.verdict === "VALID" ? "ok" : "bad"}">Your entry is in. The AI validators marked it <b>${esc(mine.verdict)}</b> — ${esc(mine.reason)}.</div>`;
     } else {
       enterBlock = `
       <form class="enter" id="enterForm" novalidate>
         <h3 style="margin:0 0 6px">Enter this giveaway</h3>
-        <p style="margin:0 0 16px;color:var(--muted);font-size:15px">One entry per wallet. Your proof link must be public — validators can't log in to see it.</p>
+        <p style="margin:0 0 16px;color:var(--muted);font-size:15px">One entry per wallet and per proof link. Your proof link must be public — validators can't log in to see it. If you win, the contract sends the GEN to your prize wallet.</p>
         <div class="grid">
-          <div class="field"><label for="eWallet">Prize wallet</label><input id="eWallet" class="mono" placeholder="0x… or any address for the prize" maxlength="120" value="${esc(account || "")}"></div>
+          <div class="field"><label for="eWallet">Prize wallet</label><input id="eWallet" class="mono" placeholder="0x…" maxlength="42" value="${esc(account || "")}"></div>
           <div class="field"><label for="eProof">Proof link</label><input id="eProof" placeholder="https://…" maxlength="400" inputmode="url"></div>
         </div>
         <button class="btn" type="submit" id="enterBtn">Submit entry</button>
@@ -687,20 +778,47 @@ async function openDetail(id, keepScroll) {
   }
 
   let hostBlock = "";
-  if (g.status === "open" && isHost) {
+  if (ph === "entries" && isHost && Number(g.entry_count) === 0) {
     hostBlock = `<div class="section"><h3>You're the host</h3>
-      <p style="margin:0 0 12px;color:var(--muted)">Closing stops new entries and runs the draw from all <b style="color:var(--ink)">${esc(g.valid_count)}</b> valid entries. This can't be undone.</p>
-      <button class="btn gold" id="closeBtn">Close entries and draw ${Number(g.winners_count) === 1 ? "the winner" : "winners"}</button>
-      <div id="closeStatus" aria-live="polite" style="margin-top:12px"></div></div>`;
+      <p style="margin:0 0 12px;color:var(--muted)">Nobody has entered yet, so you can still cancel and get your ${esc(fmtGEN(g.prize_wei))} GEN back. After the first entry, cancelling is locked.</p>
+      <button class="btn ghost" id="cancelBtn">Cancel and refund my prize</button>
+      <div id="cancelStatus" aria-live="polite" style="margin-top:12px"></div></div>`;
+  }
+
+  let drawBlock = "";
+  if (ph === "draw") {
+    const readyAt = Number(g.draw_round_time) + 6;
+    const ready = nowS() >= readyAt;
+    const late = nowS() >= Number(g.draw_deadline);
+    drawBlock = `<div class="section"><h3>Entries are closed — run the draw</h3>
+      <p style="margin:0 0 12px;color:var(--muted)">Anyone can press this, not just the host. The winners come from drand round <b class="mono" style="color:var(--ink)">${esc(g.draw_round)}</b>, which was published after closing and is fixed on-chain, so the result is the same whoever presses it and whenever. The contract then pays ${esc(fmtGEN(g.prize_wei))} GEN to the ${Number(g.winners_count) === 1 ? "winner" : "winners"}.</p>
+      <button class="btn gold" id="drawBtn" ${ready ? "" : "disabled"}>${ready ? "Draw and pay the " + (Number(g.winners_count) === 1 ? "winner" : "winners") : "Waiting for the drand round…"}</button>
+      ${late ? `<p style="margin:16px 0 8px;color:var(--muted)">The 24-hour draw window has passed. If the draw still can't run, split the prize equally between all ${esc(g.valid_count)} valid entrants instead:</p><button class="btn ghost" id="splitBtn">Split prize between valid entrants</button>` : `<p style="margin:12px 0 0;font-size:14px;color:var(--muted)">Safety exit: if the draw can't run by ${esc(fmtTime(g.draw_deadline))}, anyone can split the prize between all valid entrants. The host never gets it back once valid entries exist.</p>`}
+      <div id="drawStatus" aria-live="polite" style="margin-top:12px"></div></div>`;
   }
 
   let winnersBlock = "";
-  if (g.status === "closed") {
-    const ws = g.winners || [];
-    winnersBlock = `<div class="section"><h3>${ws.length === 1 ? "Winner" : "Winners"}</h3>${ws.length ? `<div class="winners">${ws.map((w, i) => `
-      <div class="winner"><span class="place">${i + 1}</span><div class="who"><div class="mono">${esc(w.wallet)}</div><small>entered by ${esc(short(w.entrant))}${safeUrl(w.proof_url) ? ` · <a href="${esc(w.proof_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--ticket)">proof</a>` : ""}</small></div></div>`).join("")}</div>` : `<div class="notice info">No valid entries, so no winner was drawn.</div>`}</div>
-      <div class="section"><h3>Check the draw yourself</h3><div class="tape" id="dTape"><div>Recomputing…</div></div></div>`;
+  if (ph === "settled") {
+    const pays = g.payouts || [];
+    const payRows = pays.map((p) => `<tr><td class="mono">${esc(p.to)}</td><td><b>${esc(fmtGEN(p.amount_wei))} GEN</b></td><td>${esc(p.why)}</td></tr>`).join("");
+    const payTable = pays.length ? `<table class="payouts entries-table"><thead><tr><th>Sent to</th><th>Amount</th><th>Why</th></tr></thead><tbody>${payRows}</tbody></table>` : "";
+    if (g.status === "paid") {
+      const ws = g.winners || [];
+      winnersBlock = `<div class="section"><h3>${ws.length === 1 ? "Winner" : "Winners"} — paid by the contract</h3><div class="winners">${ws.map((w, i) => `
+        <div class="winner"><span class="place">${i + 1}</span><div class="who"><div class="mono">${esc(w.wallet)}</div><small>${esc(fmtGEN(w.amount_wei))} GEN · entered by ${esc(short(w.entrant))}${safeUrl(w.proof_url) ? ` · <a href="${esc(w.proof_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--ticket)">proof</a>` : ""}</small></div></div>`).join("")}</div></div>
+        <div class="section"><h3>Check the draw yourself</h3><div class="tape" id="dTape"><div>Recomputing…</div></div></div>`;
+    } else {
+      const msg = g.status === "split" ? "The draw couldn't run in time, so the prize was split equally between every valid entrant."
+        : g.status === "no_winners" ? "No entry passed the AI check, so the locked prize went back to the host."
+        : "The host cancelled before anyone entered, so the prize went back to the host.";
+      winnersBlock = `<div class="section"><h3>${esc(SETTLED[g.status] || g.status)}</h3><div class="notice info">${msg}</div></div>`;
+    }
+    if (payTable) winnersBlock += `<div class="section"><h3>Payments sent by the contract</h3>${payTable}</div>`;
   }
+
+  const timing = ph === "entries"
+    ? `<span>Closes <b>${esc(fmtTime(g.close_at))}</b> · <b class="countdown" id="cd">${esc(fmtLeft(Number(g.close_at) - nowS()))}</b> left</span>`
+    : `<span>Closed <b>${esc(fmtTime(g.close_at))}</b></span>`;
 
   const rows = entries.length ? entries.map((e) => {
     const isWin = winnerSet.has(e.entrant.toLowerCase() + "|" + e.wallet);
@@ -711,22 +829,25 @@ async function openDetail(id, keepScroll) {
       <td>${u ? `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(u.replace(/^https?:\/\//, "").slice(0, 38))}</a>` : esc(e.proof_url)}</td>
       <td><span class="chip ${esc(e.verdict)}">${esc(e.verdict)}</span>${isWin ? ` <span class="chip win">winner</span>` : ""}</td>
     </tr>`;
-  }).join("") : `<tr><td colspan="4" style="color:var(--muted)">No entries yet. ${g.status === "open" ? "Be the first." : ""}</td></tr>`;
+  }).join("") : `<tr><td colspan="4" style="color:var(--muted)">No entries yet. ${ph === "entries" ? "Be the first." : ""}</td></tr>`;
 
   dlg.innerHTML = `
     <div class="dlg-head">
-      <div><h2 id="dTitle">${esc(g.title)}</h2><div class="prize">${esc(g.prize || "Prize not stated")}</div></div>
+      <div><h2 id="dTitle">${esc(g.title)}</h2><div class="prize"><span class="lock">🔒 ${esc(fmtGEN(g.prize_wei))} GEN ${g.status === "open" ? "locked in the contract" : ""}</span></div></div>
       <button class="x" type="button" aria-label="Close">×</button>
     </div>
     <div class="dlg-body">
       <div class="facts">
         <span>Giveaway <b>#${esc(g.id)}</b></span>
-        <span>Status <b>${g.status === "closed" ? "Drawn" : "Open for entries"}</b></span>
+        <span>Status <b>${esc(stateLabel(g))}</b></span>
+        ${timing}
         <span>Host <b class="mono">${esc(short(g.host))}</b>${isHost ? `<span class="you">you</span>` : ""}</span>
         <span><b>${esc(g.winners_count)}</b> ${Number(g.winners_count) === 1 ? "winner" : "winners"}</span>
+        <span>drand round <a class="mono" href="${esc(DRAND_URL(g.draw_round))}" target="_blank" rel="noopener noreferrer">${esc(g.draw_round)}</a></span>
       </div>
       <div class="section"><h3>Rules the AI checks against</h3><div class="rules">${esc(g.rules)}</div></div>
       ${winnersBlock}
+      ${drawBlock}
       ${enterBlock}
       ${hostBlock}
       <div class="section"><h3>Entries (${esc(g.entry_count)})</h3>
@@ -745,16 +866,39 @@ async function openDetail(id, keepScroll) {
   };
   const dc = $("#dConnect", dlg); if (dc) dc.onclick = () => connectWallet();
 
-  if (g.status === "closed") {
+  const ef = $("#enterForm", dlg);
+  if (ef) ef.addEventListener("submit", (ev) => { ev.preventDefault(); submitEntry(g); });
+  const db = $("#drawBtn", dlg);
+  if (db) db.onclick = () => runSettle(g, "draw", db);
+  const sb = $("#splitBtn", dlg);
+  if (sb) sb.onclick = () => runSettle(g, "split_to_entrants", sb);
+  const xb = $("#cancelBtn", dlg);
+  if (xb) xb.onclick = () => cancelGiveaway(g);
+
+  // live countdown; re-render when the phase changes (entries -> draw, or drand round ready)
+  clearInterval(cdTimer);
+  if (g.status === "open") {
+    const readyAt = Number(g.draw_round_time) + 6;
+    cdTimer = setInterval(() => {
+      if (!dlg.open || currentId !== id) { clearInterval(cdTimer); return; }
+      const cd = $("#cd", dlg);
+      if (cd) cd.textContent = fmtLeft(Number(g.close_at) - nowS());
+      const nowPhase = phase(g);
+      const btn = $("#drawBtn", dlg);
+      if (nowPhase !== ph || (btn && btn.disabled && nowS() >= readyAt && !busy)) {
+        clearInterval(cdTimer);
+        openDetail(id, true);
+      }
+    }, 1000);
+  }
+
+  if (g.status === "paid") {
     const r = await recomputeDraw(g, entries);
     const t = $("#dTape", dlg); if (t) t.innerHTML = tapeHTML(g, r, false);
   }
-
-  const ef = $("#enterForm", dlg);
-  if (ef) ef.addEventListener("submit", (ev) => { ev.preventDefault(); submitEntry(g); });
-  const cb = $("#closeBtn", dlg);
-  if (cb) cb.onclick = () => closeAndDraw(g);
 }
+let cdTimer = null;
+let busy = false;
 
 function stepTo(listEl, key) {
   const order = [...listEl.children].map((li) => li.dataset.s);
@@ -767,7 +911,8 @@ async function submitEntry(g) {
   const status = $("#enterStatus", dlg);
   const wallet = $("#eWallet", dlg).value.trim();
   const proof = $("#eProof", dlg).value.trim();
-  if (!wallet) { status.innerHTML = `<div class="notice bad">Add the wallet address that should receive the prize.</div>`; return; }
+  if (!/^0x[0-9a-fA-F]{40}$/.test(wallet)) { status.innerHTML = `<div class="notice bad">Prize wallet must be a 0x address (42 characters). The contract pays the prize there.</div>`; return; }
+  if (nowS() >= Number(g.close_at)) { status.innerHTML = `<div class="notice bad">Entries are closed for this giveaway.</div>`; return; }
   if (!/^https?:\/\/\S+\.\S+/i.test(proof)) { status.innerHTML = `<div class="notice bad">The proof link must start with https:// and point to a public page.</div>`; return; }
   if (!(await ensureWallet())) return;
 
@@ -786,7 +931,7 @@ async function submitEntry(g) {
       return es.find((e) => e.entrant.toLowerCase() === me);
     }, 150000);
     if (!found) {
-      status.innerHTML = `<div class="notice bad">Your entry wasn't saved. It may have been refused — for example if this wallet already entered, or entries are closed. Reload and check the list.</div>`;
+      status.innerHTML = `<div class="notice bad">Your entry wasn't saved. It may have been refused — for example if this wallet or proof link was already used, or entries closed. Reload and check the list.</div>`;
       btn.disabled = false; return;
     }
     allDone(prog);
@@ -799,24 +944,53 @@ async function submitEntry(g) {
   }
 }
 
-async function closeAndDraw(g) {
+async function waitSettled(id, timeoutMs = 150000) {
+  return await pollUntil(async () => {
+    const x = parse(await view("get_giveaway", [String(id)]));
+    return x.status !== "open" ? x : null;
+  }, timeoutMs);
+}
+
+async function runSettle(g, fn, btn) {
   if (!(await ensureWallet())) return;
-  if (account.toLowerCase() !== g.host.toLowerCase()) { toast("Only the host can close this giveaway."); return; }
-  if (!confirm("Close entries and draw now? This can't be undone.")) return;
-  const btn = $("#closeBtn", dlg), status = $("#closeStatus", dlg);
-  btn.disabled = true; status.innerHTML = `<div class="notice info">Confirm in your wallet, then the draw runs on-chain…</div>`;
+  const status = $("#drawStatus", dlg);
+  busy = true;
+  const label = btn.textContent;
+  btn.disabled = true;
+  status.innerHTML = `<div class="notice info">Confirm in your wallet. Validators then read drand round ${esc(g.draw_round)}, pick the winners and the contract pays them…</div>`;
   try {
-    const hash = await sendTx("close_and_pick", [String(g.id)]);
-    status.innerHTML = `<div class="notice info">Drawing winners on GenLayer…</div>`;
+    const hash = await sendTx(fn, [String(g.id)]);
+    status.innerHTML = `<div class="notice info">${fn === "draw" ? "Drawing and paying on GenLayer…" : "Splitting the prize on GenLayer…"}</div>`;
     await waitTx(hash);
-    const done = await pollUntil(async () => {
-      const x = parse(await view("get_giveaway", [String(g.id)]));
-      return x.status === "closed" ? x : null;
-    }, 120000);
-    if (!done) { status.innerHTML = `<div class="notice bad">The draw isn't confirmed yet. Reload in a minute to see the result.</div>`; btn.disabled = false; return; }
-    toast("Winners drawn");
+    const done = await waitSettled(g.id);
+    if (!done) {
+      status.innerHTML = `<div class="notice bad">Not settled yet. If the drand round was not readable, the transaction is refused and nothing changes — wait a minute and press the button again.</div>`;
+      btn.disabled = false; btn.textContent = label; busy = false; return;
+    }
+    toast(done.status === "paid" ? "Winners drawn and paid" : (SETTLED[done.status] || "Settled"));
+    busy = false;
     await loadAll();
     renderHeroTape();
+    await openDetail(g.id, false);
+  } catch (e) {
+    status.innerHTML = `<div class="notice bad">${esc(niceError(e))}</div>`;
+    btn.disabled = false; btn.textContent = label; busy = false;
+  }
+}
+
+async function cancelGiveaway(g) {
+  if (!(await ensureWallet())) return;
+  if (account.toLowerCase() !== g.host.toLowerCase()) { toast("Only the host can cancel."); return; }
+  const btn = $("#cancelBtn", dlg), status = $("#cancelStatus", dlg);
+  btn.disabled = true; status.innerHTML = `<div class="notice info">Confirm in your wallet…</div>`;
+  try {
+    const hash = await sendTx("cancel_giveaway", [String(g.id)]);
+    status.innerHTML = `<div class="notice info">Cancelling and refunding on GenLayer…</div>`;
+    await waitTx(hash);
+    const done = await waitSettled(g.id, 120000);
+    if (!done) { status.innerHTML = `<div class="notice bad">Not confirmed. Someone may have entered just before — reload and check.</div>`; btn.disabled = false; return; }
+    toast("Cancelled — prize refunded");
+    await loadAll();
     await openDetail(g.id, false);
   } catch (e) {
     status.innerHTML = `<div class="notice bad">${esc(niceError(e))}</div>`;
@@ -833,10 +1007,13 @@ $("#wPlus").onclick = () => { winners = Math.min(50, winners + 1); wOut.textCont
 $("#create").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const title = $("#cTitle").value.trim();
-  const prize = $("#cPrize").value.trim();
+  const prizeWei = parseGEN($("#cPrize").value);
+  const minutes = Number($("#cDuration").value);
   const rules = $("#cRules").value.trim();
   const st = $("#createStatus");
   if (!title) { st.innerHTML = `<div class="notice bad" style="margin-top:12px">Add a title for your giveaway.</div>`; $("#cTitle").focus(); return; }
+  if (!prizeWei || prizeWei <= 0n) { st.innerHTML = `<div class="notice bad" style="margin-top:12px">Enter the GEN prize to lock, for example 10.</div>`; $("#cPrize").focus(); return; }
+  if (prizeWei < BigInt(winners)) { st.innerHTML = `<div class="notice bad" style="margin-top:12px">The prize is too small to split between ${winners} winners.</div>`; $("#cPrize").focus(); return; }
   if (rules.length < 15) { st.innerHTML = `<div class="notice bad" style="margin-top:12px">Write the rules in a full sentence so the AI can judge entries.</div>`; $("#cRules").focus(); return; }
   if (!(await ensureWallet())) return;
 
@@ -844,7 +1021,7 @@ $("#create").addEventListener("submit", async (ev) => {
   btn.disabled = true; btn.textContent = "Confirm in your wallet…"; st.innerHTML = "";
   try {
     const before = Number(await view("get_giveaway_count"));
-    const hash = await sendTx("create_giveaway", [title, rules, prize, winners]);
+    const hash = await sendTx("create_giveaway", [title, rules, winners, minutes], prizeWei);
     btn.textContent = "Publishing on GenLayer…";
     await waitTx(hash);
     const newId = await pollUntil(async () => {
@@ -852,7 +1029,7 @@ $("#create").addEventListener("submit", async (ev) => {
       return c > before ? c : null;
     }, 120000);
     if (!newId) { st.innerHTML = `<div class="notice bad" style="margin-top:12px">Not confirmed yet. Reload in a minute — it should appear in the list.</div>`; return; }
-    $("#create").reset(); winners = 1; wOut.textContent = 1;
+    $("#create").reset(); $("#cDuration").value = "1440"; winners = 1; wOut.textContent = 1;
     toast("Giveaway #" + newId + " published");
     await loadAll();
     location.hash = "g-" + newId;
